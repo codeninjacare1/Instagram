@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<main class="main-container">
+    <section class="content-container">
+        <div class="content">
+            <div class="stories">
+                <button class="stories__left-button">
+                    <!-- SVG omitted for brevity -->
+                </button>
+                <div class="stories__content">
+                    {% if my_active_stories %}
+                        <button class="story">
+                            <a href="{% url 'storyapp:story_detail' my_active_stories.0.pk %}">
+                                <div class="story__avatar">
+                                    <div class="story__border">
+                                        <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                                            <circle r="31" cy="32" cx="32"/>
+                                        </svg>
+                                    </div>
+                                    <div class="story__picture">
+                                        <img src="{{ my_active_stories.0.content.url }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                        {% if my_active_stories.0.user.profile.is_online %}
+                                            <span class="online-status online" title="Online"></span>
+                                        {% else %}
+                                            <span class="online-status" title="Offline"></span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <span class="story__user">Your Story</span>
+                            </a>
+                        </button>
+                    {% else %}
+                        <button class="story">
+                            <a href="{% url 'storyapp:add_story' %}">
+                                <div class="story__avatar">
+                                    <div class="story__border">
+                                        <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                                            <circle r="31" cy="32" cx="32"/>
+                                        </svg>
+                                    </div>
+                                    <div class="story__picture" style="background-color: #eee; display: flex; justify-content: center; align-items: center;">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 4V20M4 12H20" stroke="#8e8e8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="story__user">Add Story</span>
+                            </a>
+                        </button>
+                    {% endif %}
+
+                    {% for story in stories %}
+                        {% if story.user != request.user %}
+                            <button class="story">
+                                <a href="{% url 'storyapp:story_detail' story.pk %}">
+                                    <div class="story__avatar">
+                                        <div class="story__border">
+                                            <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                                                <circle r="31" cy="32" cx="32"/>
+                                            </svg>
+                                        </div>
+                                        <div class="story__picture">
+                                            <img src="{{ story.content.url }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                            {% if story.user.profile.is_online %}
+                                                <span class="online-status online" title="Online"></span>
+                                            {% else %}
+                                                <span class="online-status" title="Offline"></span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <span class="story__user">@{{ story.user.username }}</span>
+                                </a>
+                            </button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="stories__right-button">
+                    <!-- SVG omitted for brevity -->
+                </button>
+            </div>
+
+            <div class="posts">
+                {% for post in post_items %}
+                <article class="post">
+                    <div class="post__header">
+                        <div class="post__profile">
+                            {% if post.user.profile.image %}
+                                <a href="{{ post.user.profile.image.url }}" class="post__avatar">
+                                    <div style="position: relative; display: inline-block;">
+                                        <img src="{{ post.user.profile.image.url }}" class="rounded-circle mr-1" alt="img" width="40" height="40">
+                                        {% if post.user.profile.is_online %}
+                                            <span class="online-status online" title="Online"></span>
+                                        {% else %}
+                                            <span class="online-status" title="Offline"></span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            {% endif %}
+                            <a href="{{ post.user.username }}" class="post__user">{{ post.user.username }}</a>
+                        </div>
+                        <div class="dropdown">
+                            <button class="post__more-options" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <!-- SVG omitted for brevity -->
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% if request.user == post.user %}
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{% url 'delete-post' post.id %}" onclick="return confirm('Are you sure you want to delete this post?')">Delete Post</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="post__content">
+                        <div class="post__medias">
+                            <a href="{% url 'post-details' post.id %}">
+                                <img class="post__media" src="{{ post.picture.url }}" alt="Post Content" style="width: 700px; height: 348px; object-fit: cover;">
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="post__footer">
+                        <div class="post__buttons">
+                            <!-- LIKE -->
+                            <a href="{% url 'like' post.id %}" class="post__button">
+                                {% if post.liked %}
+                                    <!-- Filled Heart SVG -->
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="red" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                {% else %}
+                                    <!-- Outlined Heart SVG -->
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                {% endif %}
+                            </a>
+
+                            <a href="{% url 'post-details' post.id %}" class="post__button">
+    <!-- Comment SVG -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+</a>
+
+                            <!-- SHARE -->
+<button class="post__button" data-bs-toggle="modal" data-bs-target="#shareModal{{ post.id }}">
+    <!-- Share SVG -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M22.8555 3.44542C22.6978 3.16703 22.3962 3 22.0714 3L2.91369 3.01392C2.52859 3.01392 2.19453 3.25055 2.05997 3.60781C1.96254 3.86764 1.98574 4.14603 2.11565 4.37338C2.16669 4.45689 2.23165 4.53577 2.31052 4.60537L9.69243 10.9712L11.4927 20.5338C11.5623 20.9096 11.8499 21.188 12.2304 21.2483C12.6062 21.3086 12.9774 21.1323 13.1723 20.8029L22.8509 4.35018C23.0179 4.06715 23.0179 3.72381 22.8555 3.44542ZM4.21748 4.39194H19.8164L10.4255 9.75089L4.21748 4.39194ZM12.6248 18.9841L11.1122 10.948L20.5171 5.58436L12.6248 18.9841Z" fill="var(--text-dark)" stroke="var(--text-dark)" stroke-width="0.3"/>
+                                    </svg>
+</button>
+
+                            <!-- SHARE MODAL -->
+                            <div class="modal fade" id="shareModal{{ post.id }}" tabindex="-1" aria-labelledby="shareModalLabel{{ post.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="shareModalLabel{{ post.id }}">Share Post</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="share-users-list">
+                                                {% for user in share_users %}
+                                                    <div class="share-user-item">
+                                                        <a href="{% url 'share-post' post.id user.id %}" class="d-flex align-items-center text-decoration-none text-dark">
+                                                            <img src="{{ user.profile.image.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                            {% if user.profile.is_online %}
+                                                                <div class="online-status online" title="Online"></div>
+                                                            {% else %}
+                                                                <div class="online-status" title="Offline"></div>
+                                                            {% endif %}
+                                                            <div>
+                                                                <h6 class="mb-0">{{ user.username }}</h6>
+                                                                <small class="text-muted">
+                                                                    {% if user.profile.first_name or user.profile.last_name %}
+                                                                        {{ user.profile.first_name }} {{ user.profile.last_name }}
+                                                                    {% else %}
+                                                                        @{{ user.username }}
+                                                                    {% endif %}
+                                                                </small>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+<!-- BOOKMARK -->
+<a href="{% url 'favourite' post.id %}" class="post__button post__button--align-right" id="save-post-{{ post.id }}" data-post-id="{{ post.id }}">
+    {% if post.id in favourite_ids %}
+        <!-- Filled Bookmark SVG -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dark)" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>
+        </svg>
+    {% else %}
+        <!-- Outlined Bookmark SVG -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="0.7" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>
+        </svg>
+    {% endif %}
+</a>
+                        </div>
+
+                        <div class="post__infos">
+                            <div class="post__likes">
+                                <span>{{ post.likes }} <a class="post__name--underline" href="#">likes</a></span>
+                            </div>
+                            <div class="post__description">
+                                <span>
+                                    <a class="post__name--underline" href="#"><b>@{{ post.user.username }}</b></a>
+                                    {{ post.caption }}
+                                </span>
+                            </div>
+                            <p style="font-size: 13px;">
+                                {% for tag in post.tags.all %}
+                                    <a href="{{ tag.get_absolute_url }}" style="text-decoration: none;">#{{ tag }}</a>
+                                {% endfor %}
+                            </p>
+                            <span class="post__date-time">{{ post.posted }}</span>
+                        </div>
+
+                        <!-- Show latest 3 comments -->
+                        <div class="post__comments">
+                            {% if latest_comments and latest_comments|get_item:post.id %}
+                                {% for comment in latest_comments|get_item:post.id %}
+                                    <div class="post__comment">
+                                        <b>{{ comment.user.username }}</b> {{ comment.body|linebreaksbr }}
+                                        <span style="font-size:11px;color:#888;">{{ comment.date|timesince }} ago</span>
+                                    </div>
+                                {% endfor %}
+                                {% if comment_counts and comment_counts|get_item:post.id and comment_counts|get_item:post.id > 3 %}
+                                    <a href="{% url 'post-details' post.id %}" style="font-size:13px;">View all comments</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <!-- Comment form -->
+                        <div class="post__add-comment">
+                            <form method="post" action="{% url 'add-comment' post.id %}" style="display: flex; align-items: center; gap: 10px;">
+                                {% csrf_token %}
+                                {% if comment_forms and comment_forms|get_item:post.id %}
+                                    {{ comment_forms|get_item:post.id }}
+                                {% else %}
+                                    <input type="text" name="body" placeholder="Add a comment..." class="form-control" required style="width:80%;display:inline-block;">
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary btn-sm">Comment</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <section class="side-menu">
+            <div class="side-menu__user-profile">
+                <a href="{% url 'profile' request.user %}" target="_blank" class="side-menu__user-avatar">
+                    <img src="{{ request.user.profile.image.url }}" alt="User Picture">
+                    {% if request.user.profile.is_online %}
+                        <span class="online-status online" title="Online"></span>
+                    {% else %}
+                        <span class="online-status" title="Offline"></span>
+                    {% endif %}
+                </a>
+                <div class="side-menu__user-info">
+                    {% if user.profile.first_name %}
+                        <a href="{{ request.user.username }}">{{ request.user.profile.first_name|title }} {{ request.user.profile.last_name|title }}</a>
+                    {% else %}
+                        <a href="{{ request.user.username }}">{{ user.username }}</a>
+                    {% endif %}
+                    <span>@{{ request.user.username }}</span>
+                </div>
+                <a class="side-menu__user-button" href="{% url 'profile' request.user %}">View Profile</a>
+            </div>
+            <div class="side-menu__suggestions-section">
+                <div class="side-menu__suggestions-header">
+                    <h2>Suggestions for You</h2>
+                    <button>See All</button>
+                </div>
+                <div class="side-menu__suggestions-content">
+                    {% for user in all_users %}
+                        {% if request.user.username != user.username %}
+                            <div class="side-menu__suggestion">
+                                <a href="{% url 'profile' user %}" class="side-menu__suggestion-avatar">
+                                    <img src="{{ user.profile.image.url }}" alt="User Picture">
+                                    {% if user.profile.is_online %}
+                                        <span class="online-status online" title="Online"></span>
+                                    {% else %}
+                                        <span class="online-status" title="Offline"></span>
+                                    {% endif %}
+                                </a>
+                                <div class="side-menu__suggestion-info">
+                                    {% if user.profile.first_name %}
+                                        <a href="{% url 'profile' user %}">{{ user.profile.first_name|title }} {{ user.profile.last_name|title }}</a>
+                                    {% else %}
+                                        <a href="{% url 'profile' user %}">{{ user.username }}</a>
+                                    {% endif %}
+                                    <span>@{{ user.username }}</span>
+                                </div>
+                                {% if request.user.is_authenticated and request.user != user %}
+                                    {% if user.is_followed %}
+                                        <a href="{% url 'follow' user 0 %}" class="btn profile-edit-btn" style="color: red;">Unfollow</a>
+                                    {% else %}
+                                        <a href="{% url 'follow' user 1 %}" class="btn profile-edit-btn" style="color: green;">Follow</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </section>
+</main>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.post__button--align-right').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var postId = this.getAttribute('data-post-id');
+            var url = '/toggle-favourite/' + postId + '/';
+            var icon = this.querySelector('svg');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.favourite) {
+                    icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>`;
+                    showPopup('Post saved!');
+                } else {
+                    icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>`;
+                    showPopup('Post unsaved!');
+                }
+        });
+    });
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    function showPopup(message) {
+        let popup = document.createElement('div');
+        popup.className = 'popup-message';
+        popup.innerText = message;
+        document.body.appendChild(popup);
+        setTimeout(() => {
+            popup.classList.add('show');
+        }, 10);
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => popup.remove(), 300);
+        }, 1500);
+    }
+});
+</script>
+<style>
+.popup-message {
+    position: fixed;
+    top: 80px;
+    right: 30px;
+    background: #222;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    opacity: 0;
+    z-index: 9999;
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(-20px);
+}
+.popup-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.online-status {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ccc;
+    border: 2px solid #fff;
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+}
+.online-status.online {
+    background: #2ecc71;
+}
+.post__medias img {
+    min-width: 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+button.btn.btn-primary.btn-sm {
+    margin-top: 10px !important;
+}
+.post__add-comment textarea.form-control {
+    flex: 1;
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}
