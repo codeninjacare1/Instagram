@@ -1,1 +1,1 @@
-web: gunicorn Django_Instagram.wsgi
+web: daphne -b 0.0.0.0 -p 10000 Django_Instagram.asgi:application
