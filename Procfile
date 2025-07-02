@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p 10000 Django_Instagram.asgi:application
+web: daphne Django_Instagram.asgi:application --port $PORT --bind 0.0.0.0
