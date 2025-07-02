@@ -210,7 +210,7 @@ def favourite(request, post_id):
         profile.favourite.remove(post)
     else:
         profile.favourite.add(post)
-    return HttpResponseRedirect(reverse('post-details', args=[post_id]))
+    return HttpResponseRedirect(reverse('index'))
 
 
 # def add_post(request):
