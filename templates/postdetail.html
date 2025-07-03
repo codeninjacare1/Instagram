@@ -155,6 +155,7 @@
                             </div>
 
 <!-- BOOKMARK/FAVOURITE BUTTON -->
+<span class="bookmark-status" style="margin-right: 8px;"></span>
 <button type="button" class="post__button post__button--align-right js-fav-btn" data-post-id="{{ post.id }}" id="save-post-{{ post.id }}">
     {% if post.id in favourite_ids %}
         <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dark)" xmlns="http://www.w3.org/2000/svg">
@@ -268,10 +269,11 @@
                 var postId = this.getAttribute('data-post-id');
                 var url = '/toggle-favourite/' + postId + '/';
                 var icon = this.querySelector('svg');
+                var statusSpan = this.parentElement.querySelector('.bookmark-status');
                 fetch(url, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-CSRFToken': getCookie('csrftoken'),
                         'X-Requested-With': 'XMLHttpRequest',
                     },
                 })
@@ -281,11 +283,16 @@
                         icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>`;
                         icon.setAttribute('fill', 'var(--text-dark)');
                         icon.setAttribute('stroke', 'none');
+                        statusSpan.innerText = 'Saved';
+                        statusSpan.style.color = 'green';
                     } else {
                         icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>`;
                         icon.setAttribute('fill', 'none');
                         icon.setAttribute('stroke', 'var(--text-dark)');
+                        statusSpan.innerText = 'Unsaved';
+                        statusSpan.style.color = 'grey';
                     }
+                    setTimeout(() => { statusSpan.innerText = ''; }, 1500);
                 });
             });
         });
@@ -336,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var postId = this.getAttribute('data-post-id');
             var url = '/toggle-favourite/' + postId + '/';
             var icon = this.querySelector('svg');
+            var statusSpan = this.parentElement.querySelector('.bookmark-status');
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -349,11 +357,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>`;
                     icon.setAttribute('fill', 'var(--text-dark)');
                     icon.setAttribute('stroke', 'none');
+                    statusSpan.innerText = 'Saved';
+                    statusSpan.style.color = 'green';
                 } else {
                     icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>`;
                     icon.setAttribute('fill', 'none');
                     icon.setAttribute('stroke', 'var(--text-dark)');
+                    statusSpan.innerText = 'Unsaved';
+                    statusSpan.style.color = 'grey';
                 }
+                setTimeout(() => { statusSpan.innerText = ''; }, 1500);
             });
         });
     });
@@ -374,3 +387,26 @@ function getCookie(name) {
 }
 </script>
 {% endblock %}
+
+{% if not showPopup %}
+<script>
+    if (typeof showPopup !== 'function') {
+        function showPopup(message) {
+            let popup = document.createElement('div');
+            popup.className = 'popup-message';
+            popup.innerText = message;
+            document.body.appendChild(popup);
+            setTimeout(() => {
+                popup.classList.add('show');
+            }, 10);
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => popup.remove(), 300);
+            }, 1500);
+        }
+        var style = document.createElement('style');
+        style.innerHTML = `.popup-message { position: fixed; top: 80px; right: 30px; background: #222; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 16px; opacity: 0; z-index: 9999; transition: opacity 0.3s, transform 0.3s; transform: translateY(-20px); } .popup-message.show { opacity: 1; transform: translateY(0); }`;
+        document.head.appendChild(style);
+    }
+</script>
+{% endif %}
