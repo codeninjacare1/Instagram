@@ -88,20 +88,18 @@
 
                         <div class="post__footer">
                             <div class="post__buttons">
-                            <!-- LIKE -->
-                            <a href="{% url 'like' post.id %}" class="post__button">
+                            <!-- LIKE BUTTON -->
+                            <button type="button" class="post__button js-like-btn" data-post-id="{{ post.id }}" style="cursor:pointer; background:none; border:none; padding:0;">
                                 {% if post.liked %}
-                                    <!-- Filled Heart SVG -->
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="red" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                     </svg>
                                 {% else %}
-                                    <!-- Outlined Heart SVG -->
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                     </svg>
                                 {% endif %}
-                            </a>
+                            </button>
 
                             <a href="{% url 'post-details' post.id %}" class="post__button">
     <!-- Comment SVG -->
@@ -156,20 +154,18 @@
                                 </div>
                             </div>
 
-<!-- BOOKMARK -->
-<span class="post__button post__button--align-right bookmark-btn" id="save-post-{{ post.id }}" data-post-id="{{ post.id }}" style="cursor:pointer;">
+<!-- BOOKMARK/FAVOURITE BUTTON -->
+<button type="button" class="post__button post__button--align-right js-fav-btn" data-post-id="{{ post.id }}" id="save-post-{{ post.id }}">
     {% if post.id in favourite_ids %}
-        <!-- Filled Bookmark SVG -->
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dark)" xmlns="http://www.w3.org/2000/svg" id="bookmark-icon-{{ post.id }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dark)" xmlns="http://www.w3.org/2000/svg">
             <path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>
         </svg>
     {% else %}
-        <!-- Outlined Bookmark SVG -->
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="0.7" xmlns="http://www.w3.org/2000/svg" id="bookmark-icon-{{ post.id }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="0.7" xmlns="http://www.w3.org/2000/svg">
             <path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>
         </svg>
     {% endif %}
-</span>
+</button>
                         </div>
                             </div>
 
@@ -266,12 +262,12 @@
             });
         });
 
-        document.querySelectorAll('.bookmark-btn').forEach(function(btn) {
+        document.querySelectorAll('.js-fav-btn').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 var postId = this.getAttribute('data-post-id');
                 var url = '/toggle-favourite/' + postId + '/';
-                var icon = document.getElementById('bookmark-icon-' + postId);
+                var icon = this.querySelector('svg');
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -281,10 +277,14 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if(data.favourite) {
+                    if (data.favourite) {
+                        icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>`;
                         icon.setAttribute('fill', 'var(--text-dark)');
+                        icon.setAttribute('stroke', 'none');
                     } else {
+                        icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>`;
                         icon.setAttribute('fill', 'none');
+                        icon.setAttribute('stroke', 'var(--text-dark)');
                     }
                 });
             });
@@ -293,3 +293,84 @@
 </script>
 
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // LIKE BUTTON AJAX
+    document.querySelectorAll('.js-like-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var postId = this.getAttribute('data-post-id');
+            var url = '/' + postId + '/like/';
+            var heartSvg = this.querySelector('svg');
+            var likesCountSpan = document.querySelector('.post__likes span');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.liked) {
+                    heartSvg.innerHTML = `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>`;
+                    heartSvg.setAttribute('fill', 'red');
+                    heartSvg.setAttribute('stroke', 'none');
+                } else {
+                    heartSvg.innerHTML = `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>`;
+                    heartSvg.setAttribute('fill', 'none');
+                    heartSvg.setAttribute('stroke', 'var(--text-dark)');
+                }
+                if (likesCountSpan) {
+                    likesCountSpan.innerHTML = `${data.likes} <a class="post__name--underline" href="#">likes</a>`;
+                }
+            });
+        });
+    });
+    // BOOKMARK/FAVOURITE AJAX
+    document.querySelectorAll('.js-fav-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var postId = this.getAttribute('data-post-id');
+            var url = '/toggle-favourite/' + postId + '/';
+            var icon = this.querySelector('svg');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.favourite) {
+                    icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>`;
+                    icon.setAttribute('fill', 'var(--text-dark)');
+                    icon.setAttribute('stroke', 'none');
+                } else {
+                    icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>`;
+                    icon.setAttribute('fill', 'none');
+                    icon.setAttribute('stroke', 'var(--text-dark)');
+                }
+            });
+        });
+    });
+});
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
