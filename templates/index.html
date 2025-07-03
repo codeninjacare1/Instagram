@@ -126,19 +126,17 @@
                     <div class="post__footer">
                         <div class="post__buttons">
                             <!-- LIKE -->
-                            <a href="{% url 'like' post.id %}" class="post__button">
+                            <button type="button" class="post__button js-like-btn" data-post-id="{{ post.id }}" style="cursor:pointer; background:none; border:none; padding:0;">
                                 {% if post.liked %}
-                                    <!-- Filled Heart SVG -->
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="red" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                     </svg>
                                 {% else %}
-                                    <!-- Outlined Heart SVG -->
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-dark)" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                     </svg>
                                 {% endif %}
-                            </a>
+                            </button>
 
                             <a href="{% url 'post-details' post.id %}" class="post__button">
     <!-- Comment SVG -->
@@ -325,12 +323,14 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.post__button--align-right').forEach(function(btn) {
+    document.querySelectorAll('.js-like-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             var postId = this.getAttribute('data-post-id');
-            var url = '/toggle-favourite/' + postId + '/';
-            var icon = this.querySelector('svg');
+            var url = '/' + postId + '/like/';
+            console.log('Like button clicked', postId, url);
+            var heartSvg = this.querySelector('svg');
+            var likesCountSpan = this.closest('.post__footer').querySelector('.post__likes span');
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -340,17 +340,22 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                if(data.favourite) {
-                    icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2Z"/>`;
-                    showPopup('Post saved!');
+                if (data.liked) {
+                    heartSvg.innerHTML = `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>`;
+                    heartSvg.setAttribute('fill', 'red');
+                    heartSvg.setAttribute('stroke', 'none');
                 } else {
-                    icon.innerHTML = `<path d="M19.875 2H4.125C3.50625 2 3 2.44939 3 3.00481V22.4648C3 23.0202 3.36563 23.1616 3.82125 22.7728L11.5444 16.1986C11.7244 16.0471 12.0225 16.0471 12.2025 16.1936L20.1731 22.7879C20.6287 23.1666 21 23.0202 21 22.4648V3.00481C21 2.44939 20.4994 2 19.875 2ZM19.3125 20.0209L13.3444 15.0827C12.9281 14.7394 12.405 14.5677 11.8763 14.5677C11.3363 14.5677 10.8019 14.7444 10.3856 15.0979L4.6875 19.9502V3.51479H19.3125V20.0209Z"/>`;
-                    showPopup('Post unsaved!');
+                    heartSvg.innerHTML = `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>`;
+                    heartSvg.setAttribute('fill', 'none');
+                    heartSvg.setAttribute('stroke', 'var(--text-dark)');
                 }
+                if (likesCountSpan) {
+                    likesCountSpan.innerHTML = `${data.likes} <a class="post__name--underline" href="#">likes</a>`;
+                }
+            });
         });
     });
 });
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -365,42 +370,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-    function showPopup(message) {
-        let popup = document.createElement('div');
-        popup.className = 'popup-message';
-        popup.innerText = message;
-        document.body.appendChild(popup);
-        setTimeout(() => {
-            popup.classList.add('show');
-        }, 10);
-        setTimeout(() => {
-            popup.classList.remove('show');
-            setTimeout(() => popup.remove(), 300);
-        }, 1500);
-    }
-});
 </script>
-<style>
-.popup-message {
-    position: fixed;
-    top: 80px;
-    right: 30px;
-    background: #222;
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    opacity: 0;
-    z-index: 9999;
-    transition: opacity 0.3s, transform 0.3s;
-    transform: translateY(-20px);
-}
-.popup-message.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-</style>
 {% endblock %}
 
 {% block extra_css %}

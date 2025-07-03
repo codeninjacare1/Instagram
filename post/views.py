@@ -174,8 +174,8 @@ def Tags(request, tag_slug):
 
 
 # Like function
-@login_required
-def like(request, post_id):
+# @login_required
+# def like(request, post_id):
     user = request.user
     post = Post.objects.get(id=post_id)
     current_likes = post.likes
@@ -199,6 +199,29 @@ def like(request, post_id):
     else:
         # Otherwise redirect to index
         return HttpResponseRedirect(reverse('index'))
+
+@require_POST
+@login_required
+def like(request, post_id):
+    from .models import Post, Likes
+    post = Post.objects.get(id=post_id)
+    user = request.user
+    liked = Likes.objects.filter(user=user, post=post).exists()
+
+    if not liked:
+        Likes.objects.create(user=user, post=post)
+        post.likes += 1
+        post.save()
+        liked = True
+    else:
+        Likes.objects.filter(user=user, post=post).delete()
+        post.likes -= 1
+        post.save()
+        liked = False
+
+    return JsonResponse({'liked': liked, 'likes': post.likes})
+
+
 
 @login_required
 def favourite(request, post_id):
