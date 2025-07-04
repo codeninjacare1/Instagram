@@ -18,7 +18,8 @@ SECRET_KEY = 'django-insecure-e_ybrd)6lj3s(up17hy%yc=@5u_dou-@c%1y(v*yic+f-zm86#
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # ALLOWED_HOSTS = ['*']  # or your Render domain
-ALLOWED_HOSTS = ['instagram-5z7s.onrender.com', 'localhost', '127.0.0.1', '*']
+# ALLOWED_HOSTS = ['instagram-5z7s.onrender.com', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['.herokuapp.com', 'localhost', '127.0.0.1']
 # ALLOWED_HOSTS = [
 #     'localhost',
 #     '127.0.0.1',
@@ -113,6 +114,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+# Whitenoise settings
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
