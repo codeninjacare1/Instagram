@@ -1,6 +1,19 @@
 from django.urls import path
 from post.views import index, NewPost, PostDetail, Tags, like, favourite, add_comment
 from . import views
+from rest_framework.routers import DefaultRouter
+from .api_views import TagViewSet, PostFileContentViewSet, PostViewSet, LikesViewSet, FollowViewSet, StreamViewSet, StoryViewSet, SavedPostViewSet
+from django.urls import include
+
+router = DefaultRouter()
+router.register(r'tags', TagViewSet)
+router.register(r'postfilecontents', PostFileContentViewSet)
+router.register(r'posts', PostViewSet)
+router.register(r'likes', LikesViewSet)
+router.register(r'follows', FollowViewSet)
+router.register(r'streams', StreamViewSet)
+router.register(r'stories', StoryViewSet)
+router.register(r'savedposts', SavedPostViewSet)
 
 urlpatterns = [
     path('', index, name='index'),
@@ -16,4 +29,5 @@ urlpatterns = [
     path('save-post/<uuid:post_id>/', views.save_post, name='save-post'),
     path('toggle-favourite/<uuid:post_id>/', views.toggle_favourite, name='toggle-favourite'),
     path('add-comment/<uuid:post_id>/', add_comment, name='add-comment'),
+    path('api/', include(router.urls)),
 ]

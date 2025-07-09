@@ -3,6 +3,8 @@ from . import views
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from authy.views import UserProfile, EditProfile
+from rest_framework.routers import DefaultRouter
+from .api_views import ProfileViewSet
 
 
 urlpatterns = [
@@ -22,4 +24,13 @@ urlpatterns = [
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
     
+]
+
+router = DefaultRouter()
+router.register(r'profiles', ProfileViewSet)
+
+from django.urls import include
+
+urlpatterns += [
+    path('api/', include(router.urls)),
 ]

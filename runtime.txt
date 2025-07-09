@@ -1,1 +1,17 @@
 Python 3.11.1
+
+
+----------------Api All Link : -------------------
+/users/api/profiles/
+/comment/api/comments/
+/message/api/messages/
+/notification/api/notifications/
+/post/api/tags/
+/post/api/postfilecontents/
+/post/api/posts/
+/post/api/likes/
+/post/api/follows/
+/post/api/streams/
+/post/api/stories/
+/post/api/savedposts/
+/stories/api/stories/
