@@ -20,11 +20,11 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # ALLOWED_HOSTS = ['*']  # or your Render domain
 ALLOWED_HOSTS = ['instagram-5z7s.onrender.com', 'localhost', '127.0.0.1', '*']
 # ALLOWED_HOSTS = ['.herokuapp.com', 'localhost', '127.0.0.1']
-# ALLOWED_HOSTS = [
-#     'localhost',
-#     '127.0.0.1',
-#     os.getenv('RAILWAY_HOST', 'web-production-2e02.up.railway.app')
-# ]
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    os.getenv('RAILWAY_HOST', 'https://web-production-cbc8c.up.railway.app')
+]
 
 # Application definition
 INSTALLED_APPS = [
