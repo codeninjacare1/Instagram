@@ -49,10 +49,12 @@ INSTALLED_APPS = [
     'cloudinary',
     'storyapp',
     'rest_framework',
+    'corsheaders',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add for static files on Render
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -203,7 +205,12 @@ CHANNEL_LAYERS = {
 }
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://instagram-5z7s.onrender.com"
+    "https://instagram-5z7s.onrender.com",
+    'https://web-production-cbc8c.up.railway.app',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'https://web-production-cbc8c.up.railway.app',
 ]
 
 # CHANNEL_LAYERS = {
