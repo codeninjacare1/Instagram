@@ -15,18 +15,6 @@ Page content START -->
 			<div class="col-lg-4">
 				<div class="row">
 					<div class="col-md-6 col-lg-12">
-						<!-- Instructor image START -->
-						{% comment %} <div class="card shadow p-2 mb-4 text-center">
-							<div class="rounded-3">
-								<!-- Image -->
-								{% if not profile.image.url %}
-								<a href="{% url 'userauths:profile-update' %}" class="btn" style="background:linear-gradient(230deg, rgb(255, 0, 157)  0%, rgb(111, 0, 255) 100%), url(assets/img/tag-light.png) no-repeat; color: white;" >Update Profile</a>
-								{% else %}
-								<a href="{{ profile.image.url }}"><img src="{{ profile.image.url }}" class="card-img" alt="course image"></a>
-								{% endif %}
-							</div>
-						</div> {% endcomment %}
-						<!-- Instructor image START -->
 <div class="card shadow p-2 mb-4 text-center">
     <div class="rounded-3">
         {% if profile.image %}

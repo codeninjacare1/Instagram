@@ -20,11 +20,11 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # ALLOWED_HOSTS = ['*']  # or your Render domain
 ALLOWED_HOSTS = ['instagram-5z7s.onrender.com', 'localhost', '127.0.0.1', '*']
 # ALLOWED_HOSTS = ['.herokuapp.com', 'localhost', '127.0.0.1']
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    os.getenv('RAILWAY_HOST', 'https://web-production-cbc8c.up.railway.app')
-]
+# ALLOWED_HOSTS = [
+#     'localhost',
+#     '127.0.0.1',
+#     os.getenv('RAILWAY_HOST', 'web-production-2e02.up.railway.app')
+# ]
 
 # Application definition
 INSTALLED_APPS = [
@@ -49,12 +49,10 @@ INSTALLED_APPS = [
     'cloudinary',
     'storyapp',
     'rest_framework',
-    'corsheaders',
 
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add for static files on Render
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -195,22 +193,22 @@ CRON_CLASSES = [
     'cron.DeleteExpiredStoriesCronJob',
 ]
 
+# Channels/Redis configuration for real-time messaging
+import os
+
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1')
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/1")],
+            "hosts": [REDIS_URL],
         },
     },
 }
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://instagram-5z7s.onrender.com",
-    'https://web-production-cbc8c.up.railway.app',
-]
-
-CORS_ALLOWED_ORIGINS = [
-    'https://web-production-cbc8c.up.railway.app',
+    "https://instagram-5z7s.onrender.com"
 ]
 
 # CHANNEL_LAYERS = {

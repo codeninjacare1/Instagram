@@ -18,18 +18,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-
-#from elements import views as e_views
-from authy import views as auth_views
 from authy.views import UserProfile, follow
-from authy.models import Profile
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('authy.urls')),
     path('comment/', include('comment.urls')),
-    path('post/', include('post.urls')),
+    path('', include('post.urls')),  # Main feed at root
     path('message/', include('directs.urls')),
     path('notification/', include('notification.urls')),
     path('stories/', include('storyapp.urls')),
@@ -38,12 +33,9 @@ urlpatterns = [
     path('<username>/', UserProfile, name='profile'),
     path('<username>/saved/', UserProfile, name='profilefavourite'),
     path('<username>/follow/<option>/', follow, name='follow'),
-
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-
-#This is used for
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
